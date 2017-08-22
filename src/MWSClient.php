@@ -828,6 +828,34 @@ class MWSClient{
 
     }
 
+   /**
+     * Update an order fulfillment
+     * @param array $params an array containing AmazonOrderID, idPedido, CarrierName and ShipperTrackingNumber
+     * @return array feed submission result
+     */
+    public function updateFulfillment(array $params) {
+
+        $feed = [
+            'MessageType' => 'OrderFulfillment',
+            'Message' => []
+        ];
+
+        $feed['Message'][] = [
+            'MessageID' => rand(),
+            'OrderFulfillment' => [
+                'AmazonOrderID' => $params['AmazonOrderID'],
+                'MerchantFulfillmentID' => $params['MerchantFulfillmentID'],
+                'FulfillmentDate' => gmdate(self::DATE_FORMAT, time()),
+                'FulfillmentData' => [
+                    'CarrierName' => $params['CarrierName'],
+                    'ShipperTrackingNumber' => $params['ShipperTrackingNumber']
+                ]
+            ]
+        ];
+
+        return $this->SubmitFeed('_POST_ORDER_FULFILLMENT_DATA_', $feed);
+    }    
+    
     /**
      * Returns the feed processing report and the Content-MD5 header.
      * @param string $FeedSubmissionId
