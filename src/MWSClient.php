@@ -137,6 +137,9 @@ class MWSClient{
         foreach ($response as $product) {
             if (isset($product['Product']['CompetitivePricing']['CompetitivePrices']['CompetitivePrice']['Price'])) {
                 $array[$product['Product']['Identifiers']['SKUIdentifier']['SellerSKU']] = $product['Product']['CompetitivePricing']['CompetitivePrices']['CompetitivePrice']['Price'];
+                if (isset($product['Product']['SalesRankings'])){
+                    $array[$product['Product']['Identifiers']['SKUIdentifier']['SellerSKU']]['SalesRankings'] = $product['Product']['SalesRankings'];
+                }            
             } else {
                 $array[$product['@attributes']['SellerSKU']] = [];
             }
