@@ -84,6 +84,14 @@ class MWSEndPoint{
             'path' => '/Orders/2013-09-01',
             'date' => '2013-09-01'
         ],
+
+        'ListOrdersByNextToken' => [
+            'method' => 'POST',
+            'action' => 'ListOrdersByNextToken',
+            'path' => '/Orders/2013-09-01',
+            'date' => '2013-09-01'
+        ],
+
         'GetOrder' => [
             'method' => 'POST',
             'action' => 'GetOrder',
