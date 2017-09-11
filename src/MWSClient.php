@@ -389,7 +389,8 @@ class MWSClient{
     {
         $query = [
             'CreatedAfter' => gmdate(self::DATE_FORMAT, $from->getTimestamp()),
-            'FulfillmentChannel.Channel.1' => $FulfillmentChannel
+            'FulfillmentChannel.Channel.1' => $FulfillmentChannel,
+            'MaxResultsPerPage' => 9999
         ];
 
         $counter = 1;
