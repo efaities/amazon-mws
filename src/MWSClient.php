@@ -389,8 +389,7 @@ class MWSClient{
     {
         $query = [
             'CreatedAfter' => gmdate(self::DATE_FORMAT, $from->getTimestamp()),
-            'FulfillmentChannel.Channel.1' => $FulfillmentChannel,
-            'MaxResultsPerPage' => 9999
+            'FulfillmentChannel.Channel.1' => $FulfillmentChannel
         ];
 
         $counter = 1;
@@ -411,16 +410,42 @@ class MWSClient{
             'ListOrders',
             $query
         );
+        $arrResponses=array();
+        $arrResponses[]=$response;
 
-        if (isset($response['ListOrdersResult']['Orders']['Order'])) {
-            $response = $response['ListOrdersResult']['Orders']['Order'];
-            if (array_keys($response) !== range(0, count($response) - 1)) {
-                return [$response];
-            }
-            return $response;
-        } else {
-            return [];
+        if (isset($response['ListOrdersResult']['NextToken'])) {
+            do {
+                $query = [
+                    'NextToken' => $response['ListOrdersResult']['NextToken']
+                ];
+                $response = $this->request(
+                    'ListOrdersByNextToken',
+                    $query
+                );
+                $arrResponses[]=$response;
+            } while (isset($response['ListOrdersResult']['NextToken']));
         }
+
+        $finalResponse=array();
+        foreach ($arrResponses as $response) {
+            $arrOrders=array();
+            if (isset($response['ListOrdersResult']['Orders']['Order'])) {
+                $arrOrders = $response['ListOrdersResult']['Orders']['Order'];
+            }
+            if (isset($response['ListOrdersByNextTokenResult']['Orders']['Order'])) {
+                $arrOrders = $response['ListOrdersByNextTokenResult']['Orders']['Order'];
+            }
+            if (count($arrOrders>0)) {
+                if (array_keys($arrOrders) !== range(0, count($arrOrders) - 1)) {
+                    $finalResponse=array_merge($finalResponse, [$arrOrders]);
+                } else {
+                    $finalResponse=array_merge($finalResponse, $arrOrders);
+                }
+            } else {
+                $finalResponse=array_merge($finalResponse, []);
+            }
+        }
+        return $finalResponse;
     }
 
     /**
